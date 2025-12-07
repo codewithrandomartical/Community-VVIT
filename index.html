@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ✅ Primary SEO -->
+    <title>Student Community Core ( VVIT ) | Official Dashboard & Student Directory</title>
+    <meta name="description" content="Student Community Core ( VVIT ) is the official VVIT student portal to access live analytics, active batches, and the complete directory of CSE & BCA students. Secure and fast student management system.">
+    <meta name="keywords" content="Student Community Core VVIT, VVIT Student Portal, VVIT Dashboard, Student Management System, CSE BCA Students, College Portal">
+    <meta name="author" content="Student Community Core ( VVIT ) Technical Team">
+    <meta name="robots" content="index, follow">
+
+    <!-- ✅ Open Graph (Facebook, WhatsApp, LinkedIn) – same preview -->
+    <meta property="og:site_name" content="Student Community Core ( VVIT )">
+    <meta property="og:title" content="Student Community Core ( VVIT ) | Official Dashboard">
+    <meta property="og:description" content="Access live student records, department analytics, active batches and the complete directory of CSE & BCA students through the official Student Community Core ( VVIT ) portal.">
+    <meta property="og:image" content="https://i.ibb.co/7ty6G1zs/Screenshot-2025-12-07-at-3-05-22-PM.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:url" content="https://gsa-vvit.vercel.app">
+    <meta property="og:type" content="website">
+
+    <!-- ✅ Twitter Card – same preview -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Student Community Core ( VVIT ) | Student Dashboard">
+    <meta name="twitter:description" content="Official Student Community Core ( VVIT ) dashboard for student records, department analytics and batch management system.">
+    <meta name="twitter:image" content="https://i.ibb.co/7ty6G1zs/Screenshot-2025-12-07-at-3-05-22-PM.png">
+
+    <!-- ✅ Favicon – local JPG in same folder -->
+    <link rel="icon" type="image/jpeg" href="photo_6174982985677999041_w.jpg">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f3f4f6;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .sidebar-bg {
+            background-color: #111827; /* Gray-900 */
+        }
+
+        /* Nav Buttons */
+        .nav-btn {
+            background: linear-gradient(90deg, #4f46e5 0%, #4338ca 100%);
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+            transition: all 0.2s ease;
+        }
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+        .nav-btn.inactive {
+            background: transparent;
+            box-shadow: none;
+            color: #9ca3af;
+        }
+        .nav-btn.inactive:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            transform: none;
+        }
+
+        /* Stats Card */
+        .stats-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            border-bottom-width: 4px;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .border-blue-b { border-bottom-color: #3b82f6; }
+        .border-green-b { border-bottom-color: #22c55e; }
+        .border-yellow-b { border-bottom-color: #eab308; }
+        .border-red-b { border-bottom-color: #ef4444; }
+
+        /* Table */
+        .custom-table th {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6b7280;
+            background-color: #f9fafb;
+            padding: 0.75rem;
+            white-space: nowrap;
+        }
+        .custom-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.8rem;
+        }
+        .custom-table tr:hover td {
+            background-color: #f9fafb;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+
+<body class="min-h-screen flex text-gray-800">
+
+    <!-- Sidebar -->
+    <aside class="w-72 sidebar-bg flex flex-col flex-shrink-0 z-20 hidden md:flex shadow-2xl">
+        <!-- Logo Area -->
+        <div class="p-8 pb-4">
+            <div class="py-3 px-6 flex items-center justify-center transform hover:scale-105 transition-transform duration-300">
+                <span class="text-xl font-extrabold tracking-tight text-white text-center leading-snug">
+                    Student Community Core<br>
+                    <span class="text-xs text-gray-300">( VVIT )</span>
+                </span>
+            </div>
+            <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest mt-6 mb-2 pl-2">Main Menu</p>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 px-5 space-y-4">
+            <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center space-x-3 px-5 py-4 rounded-xl text-white font-medium text-left">
+                <i class="fa-solid fa-chart-pie w-5 text-lg"></i>
+                <span>Dashboard</span>
+            </button>
+            <button onclick="switchView('directory')" id="nav-directory" class="nav-btn inactive w-full flex items-center space-x-3 px-5 py-4 rounded-xl font-medium text-left">
+                <i class="fa-solid fa-address-book w-5 text-lg"></i>
+                <span>Student Directory</span>
+            </button>
+        </nav>
+
+        <!-- Sidebar Footer -->
+        <div class="p-6">
+            <div class="bg-gray-800/60 rounded-xl p-4 border border-gray-700/50 backdrop-blur-sm">
+                <div class="flex items-center space-x-2 justify-center mb-1">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <p class="text-gray-400 text-xs">System Online</p>
+                </div>
+                <p class="text-gray-600 text-[10px] text-center">&copy; 2025 Student Community Core ( VVIT )</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Mobile Header -->
+    <div class="md:hidden fixed top-0 w-full sidebar-bg text-white z-50 px-4 py-3 flex justify-between items-center shadow-md">
+        <span class="font-extrabold text-sm leading-snug">
+            Student Community Core<br><span class="text-[10px] text-gray-300">( VVIT )</span>
+        </span>
+        <button id="mobile-menu-btn" class="text-white p-2 bg-gray-800 rounded-lg">
+            <i class="fa-solid fa-bars text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Mobile Nav Overlay -->
+    <div id="mobile-nav" class="fixed inset-0 bg-gray-900/95 z-40 hidden flex-col pt-20 px-6 space-y-4 md:hidden backdrop-blur-sm">
+        <button onclick="switchView('dashboard'); toggleMobileMenu()" class="text-white text-lg font-bold py-4 border-b border-gray-700">Dashboard</button>
+        <button onclick="switchView('directory'); toggleMobileMenu()" class="text-white text-lg font-bold py-4 border-b border-gray-700">Student Directory</button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4 md:p-8 pt-20 md:pt-8 relative">
+
+        <!-- DASHBOARD VIEW -->
+        <div id="dashboard-view" class="max-w-7xl mx-auto animate-fade-in">
+            <header class="mb-5 sm:mb-8">
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800">Dashboard</h1>
+                <p class="text-gray-500 mt-1 text-sm">Real-time overview of student performance & metrics.</p>
+            </header>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                <!-- Total -->
+                <div class="stats-card p-5 sm:p-6 border-blue-b">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-4">
+                                <i class="fa-solid fa-users text-lg sm:text-xl"></i>
+                            </div>
+                            <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-800" id="total-students">0</h2>
+                            <p class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Total Students</p>
+                        </div>
+                        <div class="absolute -right-6 -top-6 w-20 h-20 sm:w-24 sm:h-24 bg-blue-50 rounded-full opacity-50"></div>
+                    </div>
+                </div>
+
+                <!-- CSE -->
+                <div class="stats-card p-5 sm:p-6 border-green-b">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-50 flex items-center justify-center text-green-600 mb-4">
+                                <i class="fa-solid fa-code text-lg sm:text-xl"></i>
+                            </div>
+                            <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-800" id="cse-count">0</h2>
+                            <p class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">CSE Dept</p>
+                        </div>
+                        <div class="absolute -right-6 -top-6 w-20 h-20 sm:w-24 sm:h-24 bg-green-50 rounded-full opacity-50"></div>
+                    </div>
+                </div>
+
+                <!-- BCA -->
+                <div class="stats-card p-5 sm:p-6 border-yellow-b">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-yellow-50 flex items-center justify-center text-yellow-600 mb-4">
+                                <i class="fa-solid fa-laptop-code text-lg sm:text-xl"></i>
+                            </div>
+                            <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-800" id="bca-count">0</h2>
+                            <p class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">BCA Dept</p>
+                        </div>
+                        <div class="absolute -right-6 -top-6 w-20 h-20 sm:w-24 sm:h-24 bg-yellow-50 rounded-full opacity-50"></div>
+                    </div>
+                </div>
+
+                <!-- Batches -->
+                <div class="stats-card p-5 sm:p-6 border-red-b">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-red-50 flex items-center justify-center text-red-600 mb-4">
+                                <i class="fa-solid fa-layer-group text-lg sm:text-xl"></i>
+                            </div>
+                            <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-800">5</h2>
+                            <p class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Active Batches</p>
+                        </div>
+                        <div class="absolute -right-6 -top-6 w-20 h-20 sm:w-24 sm:h-24 bg-red-50 rounded-full opacity-50"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="bg-white rounded-2xl shadow-sm p-4 sm:p-8 mb-6 sm:mb-8 border border-gray-100">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 sm:mb-6 gap-3">
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-800">Student Distribution</h3>
+                    <div class="flex flex-wrap space-x-2 md:space-x-3">
+                        <span class="flex items-center text-[11px] sm:text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
+                            <span class="w-2.5 h-2.5 rounded-full bg-blue-500 mr-2"></span> CSE
+                        </span>
+                        <span class="flex items-center text-[11px] sm:text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
+                            <span class="w-2.5 h-2.5 rounded-full bg-yellow-400 mr-2"></span> BCA
+                        </span>
+                    </div>
+                </div>
+                <div class="h-64 md:h-80 w-full">
+                    <canvas id="studentChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIRECTORY VIEW -->
+        <div id="directory-view" class="hidden max-w-7xl mx-auto h-full flex flex-col animate-fade-in">
+            <header class="mb-4 sm:mb-6 flex-shrink-0">
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800">Student Directory</h1>
+                <p class="text-gray-500 mt-1 text-sm">Complete list of registered students (synced from Google Sheets).</p>
+            </header>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 flex-1 flex flex-col overflow-hidden">
+                <!-- Toolbar -->
+                <div class="p-4 sm:p-5 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4 bg-gray-50/30">
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-indigo-50 px-3 sm:px-4 py-1.5 rounded-lg border border-indigo-100 text-[11px] sm:text-xs font-bold text-indigo-700 uppercase tracking-wide">
+                            Total Records: <span id="total-records-badge" class="ml-1 text-sm">0</span>
+                        </span>
+                    </div>
+
+                    <div class="relative w-full md:w-96">
+                        <i class="fa-solid fa-search absolute left-3.5 top-3.5 text-gray-400 text-sm"></i>
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            placeholder="Search by name, roll no or branch..." 
+                            class="w-full pl-9 pr-4 py-2.5 sm:py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm bg-white shadow-sm transition-all"
+                        >
+                    </div>
+                </div>
+
+                <!-- Table Container -->
+                <div class="flex-1 overflow-y-auto overflow-x-auto">
+                    <table class="w-full min-w-[650px] text-left border-collapse custom-table">
+                        <thead class="sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th>Student Profile</th>
+                                <th>Roll No</th>
+                                <th>Branch / Sem</th>
+                                <th>Contact</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- JS populates -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="no-results" class="hidden p-10 sm:p-12 text-center text-gray-400">
+                    <i class="fa-regular fa-folder-open text-3xl sm:text-4xl mb-3 opacity-50"></i>
+                    <p class="mt-2 font-medium text-sm sm:text-base">No students found matching your search.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JS Logic -->
+    <script>
+        const STUDENT_API_URL = "/api/students";
+
+        let students = [];
+        let chart = null;
+
+        function haptic(duration = 15) {
+            if (navigator.vibrate) {
+                navigator.vibrate(duration);
+            }
+        }
+
+        function switchView(viewName) {
+            const dashboard = document.getElementById('dashboard-view');
+            const directory = document.getElementById('directory-view');
+            const btnDash = document.getElementById('nav-dashboard');
+            const btnDir = document.getElementById('nav-directory');
+
+            dashboard.classList.add('hidden');
+            directory.classList.add('hidden');
+            btnDash.classList.add('inactive');
+            btnDir.classList.add('inactive');
+
+            if (viewName === 'dashboard') {
+                dashboard.classList.remove('hidden');
+                btnDash.classList.remove('inactive');
+            } else {
+                directory.classList.remove('hidden');
+                btnDir.classList.remove('inactive');
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-nav');
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+        }
+
+        document.getElementById('mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+
+        const tableBody = document.getElementById('tableBody');
+        const noResults = document.getElementById('no-results');
+        const searchInput = document.getElementById('searchInput');
+        const totalStudentsEl = document.getElementById('total-students');
+        const totalRecordsBadgeEl = document.getElementById('total-records-badge');
+        const cseCountEl = document.getElementById('cse-count');
+        const bcaCountEl = document.getElementById('bca-count');
+
+        function updateStats() {
+            totalStudentsEl.textContent = students.length;
+            totalRecordsBadgeEl.textContent = students.length;
+            cseCountEl.textContent = students.filter(s => s.branch.toUpperCase() === 'CSE').length;
+            bcaCountEl.textContent = students.filter(s => s.branch.toUpperCase() === 'BCA').length;
+        }
+
+        function renderTable(data) {
+            tableBody.innerHTML = '';
+
+            if (data.length === 0) {
+                noResults.classList.remove('hidden');
+                return;
+            } else {
+                noResults.classList.add('hidden');
+            }
+
+            data.forEach(student => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition-colors";
+
+                const isCSE = student.branch.toUpperCase() === 'CSE';
+                const avatarBg = isCSE ? 'bg-blue-100 text-blue-600' : 'bg-yellow-100 text-yellow-600';
+                const badgeBg = isCSE ? 'bg-blue-50 text-blue-700' : 'bg-yellow-50 text-yellow-700';
+
+                tr.innerHTML = `
+                    <td>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full ${avatarBg} flex items-center justify-center text-xs sm:text-sm font-bold">
+                                ${student.name.substring(0,2).toUpperCase()}
+                            </div>
+                            <div>
+                                <div class="font-bold text-gray-800 text-sm">${student.name}</div>
+                                <div class="text-[10px] text-gray-400 uppercase tracking-wide">Student</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-xs sm:text-sm font-mono text-gray-600">${student.roll}</td>
+                    <td>
+                        <span class="px-2 py-1 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wide ${badgeBg}">
+                            ${student.branch} - ${(student.sem || '').split(' ')[0] || student.sem}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="flex flex-col space-y-1 text-[11px] sm:text-xs text-gray-500">
+                             <div class="flex items-center space-x-2">
+                                <i class="fa-regular fa-envelope w-4"></i>
+                                <span class="truncate max-w-[180px] sm:max-w-none">${student.email}</span>
+                             </div>
+                             <div class="flex items-center space-x-2">
+                                <i class="fa-solid fa-phone w-4"></i>
+                                <span>${student.phone}</span>
+                             </div>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function renderChart() {
+            const ctx = document.getElementById('studentChart').getContext('2d');
+
+            const bca1 = students.filter(s => s.branch.toUpperCase() === 'BCA' && s.sem.toLowerCase().includes('1')).length;
+            const bca3 = students.filter(s => s.branch.toUpperCase() === 'BCA' && s.sem.toLowerCase().includes('3')).length;
+            const bca5 = students.filter(s => s.branch.toUpperCase() === 'BCA' && s.sem.toLowerCase().includes('5')).length;
+            const cse1 = students.filter(s => s.branch.toUpperCase() === 'CSE' && s.sem.toLowerCase().includes('1')).length;
+            const cse3 = students.filter(s => s.branch.toUpperCase() === 'CSE' && s.sem.toLowerCase().includes('3')).length;
+
+            const data = [bca1, bca3, bca5, cse1, cse3];
+
+            if (chart) {
+                chart.data.datasets[0].data = data;
+                chart.update();
+                return;
+            }
+
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['BCA 1st', 'BCA 3rd', 'BCA 5th', 'CSE 1st', 'CSE 3rd'],
+                    datasets: [{
+                        label: 'Students',
+                        data: data,
+                        backgroundColor: ['#FACC15', '#EAB308', '#CA8A04', '#3B82F6', '#2563EB'],
+                        borderRadius: 8,
+                        barThickness: 32
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f3f4f6' }, border: { display: false } },
+                        x: { grid: { display: false }, border: { display: false } }
+                    },
+                    onClick: () => {
+                        haptic(25);
+                    }
+                }
+            });
+        }
+
+        async function loadStudentsFromAPI() {
+            try {
+                const res = await fetch(STUDENT_API_URL);
+                const data = await res.json();
+                students = data;
+
+                updateStats();
+                renderTable(students);
+                renderChart();
+            } catch (err) {
+                console.error("API load error:", err);
+                document.getElementById('no-results').classList.remove('hidden');
+            }
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = students.filter(s => 
+                s.name.toLowerCase().includes(term) || 
+                s.roll.toLowerCase().includes(term) || 
+                s.branch.toLowerCase().includes(term)
+            );
+            renderTable(filtered);
+        });
+
+        function setupHaptics() {
+            document.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', () => haptic(18));
+            });
+
+            const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            if (!isTouch) return;
+
+            let lastY = window.scrollY;
+            let lastTime = performance.now();
+            let lastVibrate = 0;
+
+            window.addEventListener('scroll', () => {
+                const now = performance.now();
+                const y = window.scrollY;
+                const dy = Math.abs(y - lastY);
+                const dt = now - lastTime || 16;
+
+                lastY = y;
+                lastTime = now;
+
+                const speed = dy / dt;
+
+                let minInterval;
+                let duration;
+
+                if (speed < 0.05) {
+                    minInterval = 400;
+                    duration = 6;
+                } else if (speed < 0.25) {
+                    minInterval = 220;
+                    duration = 10;
+                } else {
+                    minInterval = 90;
+                    duration = 14;
+                }
+
+                if (now - lastVibrate > minInterval) {
+                    haptic(duration);
+                    lastVibrate = now;
+                }
+            }, { passive: true });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupHaptics();
+            loadStudentsFromAPI();
+        });
+    </script>
+</body>
+</html>
