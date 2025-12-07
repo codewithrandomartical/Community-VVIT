@@ -1,19 +1,20 @@
 // /api/students.js
+
 export default async function handler(req, res) {
-  // 👉 yahan publish-to-web wala "d/e/...." ID use kar rahe hain
+  // 👉 Publish-to-web wala ID
   const SHEET_PUB_ID =
     "2PACX-1vTaJg75EOky6LeoAtTHb_c6L7JE42tfUI-yB5ohx77yQTpUsVs9KNdSk-MToYipuPNj76gkzOqW2DUF";
 
-  // agar tumhara data first sheet me hai to gid=0 theek hai
+  // Agar data first sheet me hai to gid=0 (change karna ho to yahi pe karo)
   const SHEET_URL = `https://docs.google.com/spreadsheets/d/e/${SHEET_PUB_ID}/pub?output=csv&gid=0`;
 
   try {
     const response = await fetch(SHEET_URL);
     const csvText = await response.text();
 
-    // basic check: agar CSV nahi mila (HTML aaya) to empty
+    // Agar CSV hi nahi मिला (HTML aaya) to bhi empty bhej do
     if (!csvText.trim().includes(",")) {
-      console.error("Not CSV (maybe publish settings issue?)");
+      console.error("Not CSV, maybe publish settings issue.");
       res.status(200).json([]);
       return;
     }
@@ -31,7 +32,7 @@ export default async function handler(req, res) {
       str
         .toLowerCase()
         .replace(/["']/g, "")
-        .replace(/[^a-z0-9]/g, ""); // sirf a-z0-9
+        .replace(/[^a-z0-9]/g, "");
 
     const header = headerRaw.map((h) => h.trim());
     const normHeader = header.map((h) => normalize(h));
@@ -41,17 +42,24 @@ export default async function handler(req, res) {
       return normHeader.findIndex((h) => normOptions.includes(h));
     };
 
-    const idxName = findIdx(["name", "student name"]);
-    const idxRoll = findIdx(["roll", "roll no", "roll number"]);
-    const idxBranch = findIdx(["branch", "course"]);
-    const idxSem = findIdx(["sem", "semester"]);
-    const idxEmail = findIdx(["email", "mail id"]);
-    const idxPhone = findIdx(["phone", "mobile", "contact"]);
+    // Try: smart header detection
+    let idxName = findIdx(["name", "student name"]);
+    let idxRoll = findIdx(["roll", "roll no", "roll number"]);
+    let idxBranch = findIdx(["branch", "course"]);
+    let idxSem = findIdx(["sem", "semester"]);
+    let idxEmail = findIdx(["email", "mail id"]);
+    let idxPhone = findIdx(["phone", "mobile", "contact"]);
 
+    // ⚠️ Fallback: agar header detect nahi hua to assume columns order:
+    // 0: Name, 1: Roll, 2: Branch, 3: Sem, 4: Email, 5: Phone
     if (idxName === -1 || idxRoll === -1) {
-      console.error("Name/Roll columns not detected in header:", header);
-      res.status(200).json([]);
-      return;
+      console.warn("Header detection failed, using fallback indexes.");
+      idxName = 0;
+      idxRoll = 1;
+      idxBranch = 2;
+      idxSem = 3;
+      idxEmail = 4;
+      idxPhone = 5;
     }
 
     const students = rows
@@ -68,7 +76,7 @@ export default async function handler(req, res) {
           phone: get(idxPhone),
         };
       })
-      .filter((s) => s.name && s.roll); // kam se kam name + roll
+      .filter((s) => s.name && s.roll); // kam se kam name + roll hona chahiye
 
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.status(200).json(students);
