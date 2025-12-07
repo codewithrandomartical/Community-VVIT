@@ -1,11 +1,9 @@
 export default async function handler(req, res) {
-  const SHEET_PUB_ID =
-    "2PACX-1vTaJg75EOky6LeoAtTHb_c6L7JE42tfUI-yB5ohx77yQTpUsVs9KNdSk-MToYipuPNj76gkzOqW2DUF";
+  // ✅ Tumhara ORIGINAL Sheet ID (edit wali link se)
+  const SHEET_ID = "1Sc6V02qZZIZcbEZVgd3RJbYVxeNXJ7tocjfzS1BtYQk";
 
-  // ✅ IMPORTANT: G.S.D Student tab ka GID
-  const GID = "0"; // agar ye 0 par kaam na kare to main next step me exact gid nikalwa dunga
-
-  const SHEET_URL = `https://docs.google.com/spreadsheets/d/e/${SHEET_PUB_ID}/pub?output=csv&gid=${GID}`;
+  // ✅ First sheet auto-fetch (no gid needed)
+  const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
 
   try {
     const response = await fetch(SHEET_URL);
@@ -16,9 +14,11 @@ export default async function handler(req, res) {
     }
 
     const lines = csvText.trim().split(/\r?\n/);
-    const rows = lines.slice(1).map(line => {
-      return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-    });
+
+    // ✅ Header remove
+    const rows = lines.slice(1).map(line =>
+      line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
+    );
 
     const students = rows
       .map(cols => ({
@@ -34,6 +34,6 @@ export default async function handler(req, res) {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.status(200).json(students);
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch students" });
+    res.status(500).json({ error: "Sheet fetch failed" });
   }
 }
