@@ -1,31 +1,32 @@
 // /api/students.js
 export default async function handler(req, res) {
-  // tumhara sheet ID
-  const SHEET_ID = "1Sc6V02qZZIZcbEZVgd3RJbYVxeNXJ7tocjfzS1BtYQk";
-  const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+  // 👉 yahan publish-to-web wala "d/e/...." ID use kar rahe hain
+  const SHEET_PUB_ID =
+    "2PACX-1vTaJg75EOky6LeoAtTHb_c6L7JE42tfUI-yB5ohx77yQTpUsVs9KNdSk-MToYipuPNj76gkzOqW2DUF";
+
+  // agar tumhara data first sheet me hai to gid=0 theek hai
+  const SHEET_URL = `https://docs.google.com/spreadsheets/d/e/${SHEET_PUB_ID}/pub?output=csv&gid=0`;
 
   try {
     const response = await fetch(SHEET_URL);
     const csvText = await response.text();
 
-    // Agar sheet private hai to yahan HTML aayega, CSV nahi
-    // is case me hum detect karke empty list bhej denge
+    // basic check: agar CSV nahi mila (HTML aaya) to empty
     if (!csvText.trim().includes(",")) {
-      console.error("Seems not a CSV (maybe sheet is private?)");
+      console.error("Not CSV (maybe publish settings issue?)");
       res.status(200).json([]);
       return;
     }
 
     const lines = csvText.trim().split(/\r?\n/);
     if (!lines.length) {
-      return res.status(200).json([]);
+      res.status(200).json([]);
+      return;
     }
 
-    // CSV header + rows
     const headerRaw = lines[0].split(",");
     const rows = lines.slice(1).map((line) => line.split(","));
 
-    // header normalize: lowercase + sab punctuation hatao
     const normalize = (str) =>
       str
         .toLowerCase()
@@ -40,8 +41,6 @@ export default async function handler(req, res) {
       return normHeader.findIndex((h) => normOptions.includes(h));
     };
 
-    // yahan tum sheet ke columns ka naam chahe kuch bhi rakho,
-    // jab tak unme ye words hain, ye mil jaayenge
     const idxName = findIdx(["name", "student name"]);
     const idxRoll = findIdx(["roll", "roll no", "roll number"]);
     const idxBranch = findIdx(["branch", "course"]);
@@ -49,9 +48,8 @@ export default async function handler(req, res) {
     const idxEmail = findIdx(["email", "mail id"]);
     const idxPhone = findIdx(["phone", "mobile", "contact"]);
 
-    // agar name ya roll hi nahi mila to direct empty
     if (idxName === -1 || idxRoll === -1) {
-      console.error("Name/Roll columns not detected in sheet header:", header);
+      console.error("Name/Roll columns not detected in header:", header);
       res.status(200).json([]);
       return;
     }
@@ -59,7 +57,6 @@ export default async function handler(req, res) {
     const students = rows
       .map((colsRaw) => {
         const cols = colsRaw.map((c) => c.trim());
-
         const get = (idx) => (idx >= 0 && idx < cols.length ? cols[idx] : "");
 
         return {
@@ -71,8 +68,7 @@ export default async function handler(req, res) {
           phone: get(idxPhone),
         };
       })
-      // kam se kam name + roll hona chahiye
-      .filter((s) => s.name && s.roll);
+      .filter((s) => s.name && s.roll); // kam se kam name + roll
 
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.status(200).json(students);
